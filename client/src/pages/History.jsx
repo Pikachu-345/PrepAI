@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { toast } from 'react-hot-toast';
-import { PlusCircle, MessageSquareText } from 'lucide-react'; 
+import { PlusCircle, MessageSquareText, Loader2 } from 'lucide-react'; 
 
 const History = () => {
   const [chats, setChats] = useState([]);
@@ -30,7 +30,10 @@ const History = () => {
   };
 
   if (loading) {
-    return <div className="flex justify-center items-center h-screen bg-gray-900 text-white"><p>Loading history...</p></div>;
+    return <div className="flex justify-center items-center h-screen bg-gray-900 text-white">
+      <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
+      <p>Loading history...</p>
+    </div>;
   }
 
   return (
