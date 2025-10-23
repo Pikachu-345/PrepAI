@@ -18,13 +18,13 @@ const DocumentUpload = ({ fileType, onUploadSuccess }) => {
     const toastId = toast.loading(`Uploading ${fileType}...`);
 
     try {
-      await axios.post('http://localhost:5000/api/documents/upload', formData, {
+      await axios.post(`${import.meta.env.VITE_API_URL}api/documents/upload`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
       });
       toast.success(`${file.name} uploaded!`, { id: toastId });
-      onUploadSuccess(); // Tell the parent page to refresh the list
+      onUploadSuccess();
     } catch (err) {
       toast.error(err.response?.data?.message || 'Upload failed', { id: toastId });
     } finally {
