@@ -21,6 +21,8 @@ const ChatSchema = new mongoose.Schema({
     ref: 'Document',
     required: true,
   },
+  resumeFilename: { type: String, required: true },
+  jdFilename: { type: String, required: true },
   messages: [MessageSchema],
 }, { timestamps: true });
 

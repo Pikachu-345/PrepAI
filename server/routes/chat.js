@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 const { protect } = require('../middlewares/authMiddleware');
 const Chunk = require('../models/Chunk');
 const Chat = require('../models/Chat');
+const Document = require('../models/Document');
 const { getEmbedding, genAI } = require('../utils/ragUtils'); 
 
 // --- @route   POST /api/chat/start ---
@@ -15,6 +16,12 @@ router.post('/start', protect, async (req, res) => {
 
   try {
     const jdChunks = await Chunk.find({ user: req.user.id, document: jdId });
+    const resumeDoc = await Document.findById(resumeId);
+    const jdDoc = await Document.findById(jdId);
+
+    if (!resumeDoc || !jdDoc) {
+      return res.status(404).json({ message: 'Resume or Job Description not found.' });
+    }
     if (!jdChunks || jdChunks.length === 0) {
       return res.status(404).json({ message: 'Selected Job Description not found.' });
     }
@@ -33,6 +40,8 @@ router.post('/start', protect, async (req, res) => {
       user: req.user.id,
       resume: resumeId,
       jd: jdId,
+      resumeFilename: resumeDoc.filename, 
+      jdFilename: jdDoc.filename,
       messages: [{ role: 'model', content: firstQuestion }],
     });
     await newChat.save();
@@ -106,6 +115,39 @@ router.post('/query', protect, async (req, res) => {
     res.status(200).json({
       response: aiResponse,
     });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Server Error');
+  }
+});
+
+// --- @route   GET /api/chat/history ---
+router.get('/history', protect, async (req, res) => {
+  try {
+    const chats = await Chat.find({ user: req.user.id.toString() })
+      .select('_id createdAt resumeFilename jdFilename') 
+      .sort({ createdAt: -1 }); 
+
+    res.status(200).json(chats);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Server Error');
+  }
+});
+
+// --- @route   GET /api/chat/:id ---
+router.get('/:id', protect, async (req, res) => {
+  try {
+    const chat = await Chat.findById(req.params.id);
+    
+    if (!chat) {
+      return res.status(404).json({ message: 'Chat not found' });
+    }
+    if (chat.user.toString() !== req.user.id.toString()) {
+      return res.status(401).json({ message: 'Not authorized' });
+    }
+
+    res.status(200).json(chat); 
   } catch (err) {
     console.error(err);
     res.status(500).send('Server Error');

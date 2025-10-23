@@ -7,6 +7,7 @@ import Login from './pages/Login';
 import Signup from './pages/Signup';
 import Upload from './pages/Upload';
 import Chat from './pages/Chat';
+import History from './pages/History';
 
 import ProtectedRoute from './components/ProtectedRoute';
 import Navbar from './components/Navbar';
@@ -42,7 +43,11 @@ function App() {
             }
           />
           <Route
-            path="/chat"
+            path="/chats"
+            element={<ProtectedRoute><History /></ProtectedRoute>}
+          />
+          <Route
+            path="/chat/:id"
             element={
               <ProtectedRoute>
                 <Chat />

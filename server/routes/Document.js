@@ -29,8 +29,6 @@ router.post('/upload', protect, upload.single('file'), async (req, res) => {
     const uploadResult = await uploadFromBuffer(req.file.buffer);
     const { secure_url } = uploadResult;
 
-    console.log('File uploaded to Cloudinary:', secure_url);
-
     const doc = new Document({
       user: req.user.id,
       type,
@@ -42,7 +40,7 @@ router.post('/upload', protect, upload.single('file'), async (req, res) => {
     const dataBuffer = new Uint8Array(req.file.buffer);
 
     const parser = new PDFParse(dataBuffer); 
-	const rawText = await parser.getText();
+	  const rawText = await parser.getText();
 
     const splitter = new RecursiveCharacterTextSplitter({
       chunkSize: 1000,
@@ -58,11 +56,8 @@ router.post('/upload', protect, upload.single('file'), async (req, res) => {
     }));
 
     const ai = new GoogleGenAI({});
-
-    console.log(`Getting ${chunksToSave.length} embeddings from Gemini...`);
     
     const texts = chunksToSave.map(chunk => chunk.text);
-    console.log('Texts to embed:', texts);
     
     const response = await ai.models.embedContent({
         model: 'gemini-embedding-001',
@@ -81,8 +76,6 @@ router.post('/upload', protect, upload.single('file'), async (req, res) => {
     });
 
     await Chunk.insertMany(chunksWithEmbeddings);
-    
-    console.log('Chunks with embeddings stored successfully.');
     
     res.status(201).json({
       message: 'Document uploaded and processed successfully',
