@@ -20,9 +20,10 @@ const Chat = () => {
     const fetchDocs = async () => {
       setLoading(true);
       try {
-        const res = await axios.get('http://localhost:5000/api/documents/list');
+        const res = await axios.get(`${import.meta.env.VITE_API_URL}api/documents/list`);
         setDocuments(res.data);
       } catch (err) {
+        console.error(err);
         toast.error('Could not fetch your documents.');
       }
       setLoading(false);
@@ -42,7 +43,7 @@ const Chat = () => {
     
     setLoading(true);
     try {
-      const res = await axios.post('http://localhost:5000/api/chat/start', {
+      const res = await axios.post(`${import.meta.env.VITE_API_URL}api/chat/start`, {
         resumeId: selectedResume,
         jdId: selectedJd,
       });
@@ -67,13 +68,14 @@ const Chat = () => {
     setLoading(true);
 
     try {
-      const res = await axios.post('http://localhost:5000/api/chat/query', {
+      const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/chat/query`, {
         chatId,
         message: input,
       });
       const aiMessage = { role: 'model', content: res.data.response };
       setMessages(prev => [...prev, aiMessage]);
     } catch (err) {
+      console.error(err);
       toast.error('Failed to get response from AI.');
     }
     setLoading(false);

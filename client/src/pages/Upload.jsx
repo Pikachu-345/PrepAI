@@ -12,7 +12,7 @@ const Upload = () => {
   const fetchDocuments = useCallback(async () => {
     try {
       setLoading(true);
-      const res = await axios.get('http://localhost:5000/api/documents/list');
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}api/documents/list`);
       setDocuments(res.data);
       
       // Check if at least one resume and one JD exists
@@ -21,6 +21,7 @@ const Upload = () => {
       setDocState({ resume: hasResume, jd: hasJD });
 
     } catch (err) {
+      console.error(err);
       toast.error('Failed to fetch documents');
     } finally {
       setLoading(false);
@@ -35,10 +36,11 @@ const Upload = () => {
     if (!window.confirm('Are you sure you want to delete this document?')) return;
     
     try {
-      await axios.delete(`http://localhost:5000/api/documents/${docId}`);
+      await axios.delete(`${import.meta.env.VITE_API_URL}api/documents/${docId}`);
       toast.success('Document deleted');
       fetchDocuments(); // Refresh the list
     } catch (err) {
+      console.error(err);
       toast.error('Failed to delete document');
     }
   };

@@ -1,9 +1,8 @@
-import { createContext, useContext, useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
+import AuthContext from './AuthContext'; 
 
-const AuthContext = createContext();
-
-export const AuthProvider = ({ children }) => {
+const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(localStorage.getItem('token') || null);
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -44,6 +43,4 @@ export const AuthProvider = ({ children }) => {
   );
 };
 
-export const useAuth = () => {
-  return useContext(AuthContext);
-};
+export default AuthProvider;
